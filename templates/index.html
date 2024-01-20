@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Fraud Detection</title>
+    <style>
+    </style>
+</head>
+<body>
+    <h1>Credit Card Fraud Detection</h1>
+
+    <form id="predictionForm">
+        <label for="csvFile">Upload CSV File:</label>
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+        <button type="button" onclick="predict()">Predict</button>
+    </form>
+
+    <div id="predictionResult" style="margin-top: 20px;"></div>
+
+    <script>
+        const predictionEndpoint = 'http://localhost:5000/predict';
+
+        function predict() {
+            // Get the uploaded CSV file
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please choose a CSV file.');
+                return;
+            }
+
+            // Read the content of the CSV file
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const csvData = event.target.result;
+
+                // Send the CSV data to the server for prediction
+                fetch(predictionEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        csvData: csvData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Display prediction result
+                    document.getElementById('predictionResult').innerHTML = 'Prediction Result: ' + JSON.stringify(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
