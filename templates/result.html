@@ -1,10 +1,10 @@
-<!-- templates/output.html -->
+<!-- templates/result.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fraudulent Credit Card Identifier - Output</title>
+    <title>Fraudulent Credit Card Identifier - Result</title>
     <style>
         body {
             display: flex;
@@ -16,7 +16,7 @@
             font-family: 'Arial', sans-serif;
         }
 
-        .output-table {
+        .result-table {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 10px;
@@ -39,3 +39,17 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
+        th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-table">
+        <h2>Fraudulent Credit Card Identifier - Result</h2>
+        {{ result | safe }}
+    </div>
+</body>
+</html>

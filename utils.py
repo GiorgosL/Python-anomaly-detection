@@ -3,10 +3,9 @@ import logging
 import configparser
 import matplotlib.pyplot as plt
 from logging.handlers import RotatingFileHandler
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from tensorflow import keras
 from keras import layers
-from sklearn import preprocessing
 from keras.optimizers import Adam
 
 def load_config(file_path):
@@ -43,7 +42,21 @@ def log_message(message, level=logging.INFO):
     """
     logging.log(level, message)
 
+def get_predictions(file, model):
 
+    df = pd.read_csv(file).head(3)
+    features = df.drop('Class', axis=1)
+    target = df['Class']
+    log_message(f'Total Entries in the predictions: {len(df)}', level=logging.INFO)
+
+    numeric_columns = features.select_dtypes(include='number').columns
+    scaler = StandardScaler()
+    features[numeric_columns] = scaler.fit_transform(features[numeric_columns])
+    model_probs = model.predict(features)
+
+    predictions = [(prob > 0.5).any() for prob in model_probs]
+    df_probs = pd.DataFrame({'Prediction': predictions, 'Verdict': ['Fraud' if pred == 1 else 'Not Fraud' for pred in predictions]})
+    return df_probs
 
 class Preprocess:
     """
@@ -59,7 +72,7 @@ class Preprocess:
         self.df['Amount'] = sc.fit_transform(self.df['Amount'].values.reshape(-1, 1))
     
     def min_max_df(self):
-        min_max_scaler = preprocessing.MinMaxScaler()
+        min_max_scaler = MinMaxScaler()
         self.x_scaled = min_max_scaler.fit_transform(self.df)
         self.df = pd.DataFrame(self.x_scaled,columns=self.df.columns.tolist())
     
@@ -70,7 +83,6 @@ class Preprocess:
             self.df = self.df[round(len(self.df)*fraction/100):]
         x = self.df.loc[:, self.df.columns != 'Class']
         return x
-
 
 class autoencoder:
     """
@@ -126,3 +138,6 @@ class autoencoder:
         
     def save_model(self,path):
         self.autoencoder.save(path)
+
+
+
