@@ -1,63 +1,112 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credit Card Fraud Detection</title>
+    <title>Fraudulent Credit Card Identifier</title>
     <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .upload-form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007BFF;
+            border: 2px solid #007BFF;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .loading-bar {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .loading-circle {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <h1>Credit Card Fraud Detection</h1>
-
-    <form id="predictionForm">
-        <label for="csvFile">Upload CSV File:</label>
-        <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
-        <button type="button" onclick="predict()">Predict</button>
-    </form>
-
-    <div id="predictionResult" style="margin-top: 20px;"></div>
-
-    <script>
-        const predictionEndpoint = 'http://localhost:5000/predict';
-
-        function predict() {
-            // Get the uploaded CSV file
-            const fileInput = document.getElementById('csvFile');
-            const file = fileInput.files[0];
-
-            if (!file) {
-                alert('Please choose a CSV file.');
-                return;
+    <div class="upload-form">
+        <h2>Fraudulent Credit Card Identifier</h2>
+        <form action="{{ url_for('index') }}" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
+            <label for="file-upload" class="custom-file-upload">Choose a file</label>
+            <input id="file-upload" type="file" name="file" accept=".csv" onchange="displayFileName()">
+            <div class="file-name" id="file-name"></div>
+            <br>
+            <br>
+            <input type="submit" class="custom-file-upload" value="Upload and Predict">
+            <div class="loading-bar" id="loading-bar">
+                <div class="loading-circle"></div>
+            </div>
+        </form>
+        <script>
+            function displayFileName() {
+                const input = document.getElementById('file-upload');
+                const fileNameDisplay = document.getElementById('file-name');
+                fileNameDisplay.textContent = input.files[0] ? `Chosen file: ${input.files[0].name}` : '';
             }
 
-            // Read the content of the CSV file
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const csvData = event.target.result;
-
-                // Send the CSV data to the server for prediction
-                fetch(predictionEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        csvData: csvData
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Display prediction result
-                    document.getElementById('predictionResult').innerHTML = 'Prediction Result: ' + JSON.stringify(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            };
-
-            reader.readAsText(file);
-        }
-    </script>
+            function showLoading() {
+                const loadingBar = document.getElementById('loading-bar');
+                loadingBar.style.display = 'block';
+            }
+        </script>
+    </div>
 </body>
 </html>

@@ -9,7 +9,6 @@ if __name__ == '__main__':
         config = ut.load_config(file_path='config.ini')
         pre = ut.Preprocess(config['Settings']['data_path'])
         pre.scale_df()
-        pre.min_max_df()
         x_train = pre.split_data(int(config['Settings']['train_split']), config['Settings']['train_label'])
         x_test = pre.split_data(int(config['Settings']['test_split']), config['Settings']['test_label'])
         ae = ut.autoencoder(x_train, x_test)
